@@ -1,0 +1,11 @@
+{
+  "name": "Roblox-MCP",
+  "postStartCommand": "bash scripts/codespace-start.sh",
+  "forwardPorts": [16384],
+  "portsAttributes": {
+    "16384": {
+      "label": "Roblox MCP Bridge",
+      "visibility": "public"
+    }
+  }
+}
