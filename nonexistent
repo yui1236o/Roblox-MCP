@@ -1,0 +1,10 @@
+--// Wait for game to load \\--
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+--// Variables \\--
+local BridgeURL = getgenv().BridgeURL or ... or "localhost:16384"
+local HttpBase = BridgeURL:match("^https://") and "https://" or "http://"
+local WsBase = HttpBase == "https://" and "wss://" or "ws://"
+local BridgeHost = BridgeURL:gsub("^https?://", ""):gsub("/+$", "")
