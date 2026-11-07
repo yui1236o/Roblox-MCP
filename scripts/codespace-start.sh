@@ -1,6 +1,21 @@
 #!/bin/bash
-# Codespace 启动脚本: 构建并启动 MCP 桥 + 自动 pinggy 公网隧道
+# Codespace 启动脚本: 打HTTPS补丁 + 构建启动 MCP 桥 + 自动 pinggy 公网隧道
 cd "$(dirname "$0")/.."
+
+# 给 connector.luau 打 HTTPS/WSS 补丁(支持 https:// 隧道地址)
+if ! grep -q "HttpBase" connector.luau; then
+  python3 - <<'PYEOF'
+p = "connector.luau"
+s = open(p).read()
+old = 'local BridgeURL = getgenv().BridgeURL or ... or "localhost:16384"'
+new = old + '\nlocal HttpBase = BridgeURL:match("^https://") and "https://" or "http://"\nlocal WsBase = HttpBase == "https://" and "wss://" or "ws://"\nlocal BridgeHost = BridgeURL:gsub("^https?://", ""):gsub("/+$", "")'
+s = s.replace(old, new, 1)
+s = s.replace('"http://" .. BridgeURL', 'HttpBase .. BridgeHost')
+s = s.replace('"ws://" .. BridgeURL', 'WsBase .. BridgeHost')
+open(p, "w").write(s)
+print("HTTPS patch applied")
+PYEOF
+fi
 
 npm install
 npm run build
